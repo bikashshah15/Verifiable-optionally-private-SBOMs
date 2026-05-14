@@ -1,0 +1,4 @@
+zenodo:
+  baseUrl: "https://zenodo.org"
+  accessToken: "${ZENODO_ACCESS_TOKEN:}"
+  autoPublish: ${ZENODO_AUTO_PUBLISH:false}

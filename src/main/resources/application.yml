@@ -1,0 +1,68 @@
+server:
+  forward-headers-strategy: framework
+spring:
+  profiles:
+    default: sandbox
+  devtools:
+    remote:
+      restart:
+        enabled: false
+  info:
+    app:
+      name: "v-ops"
+      version: v1.4.1
+      tagline: "Verifiable (optionally private) SBOMs"
+      purpose: >
+        Generates verifiable, optionally private SBOM publication records for
+        public source code repositories.
+      sbom:
+        generator: ${sbom.generator}
+        outputFormat: ${sbom.format}
+        description: >
+          Generates SBOMs using the configured generator (${sbom.generator}),
+          creates local SWID metadata, and prepares selected publication
+          artifacts for Zenodo.
+
+sbom:
+  outputDir: ${user.dir}/output/sboms
+  workDir: ${user.dir}/output/work
+  generator: syft
+  format: spdx-json
+  syft:
+    path: /usr/local/bin/syft
+  trivy:
+    path: /usr/local/bin/trivy
+
+swid:
+  enabled: true
+  entityName: "Public SBOM Publication Record Service"
+  regid: "example.org"
+  lang: "en"
+  outputDir: ${user.dir}/output/swid
+sbomSwid:
+  outputDir: ${user.dir}/output/sbom-swid
+
+
+git:
+  depth: 1
+
+zenodo:
+  enabled: true
+  reserveDoi: true
+  uploadRawSbom: true
+  uploadSwid: true
+  uploadCombinedSbom: true
+  uploadPublicationManifest: true
+  manifestOutputDir: ${user.dir}/output/publication
+  titlePrefix: "v-ops Verifiable SBOM Publication Record for"
+  accessRight: "open"
+  license: "cc-by-4.0"
+  creators:
+    - name: "Shah, Bikash"
+      affiliation: "University of North Carolina at Charlotte"
+    - name: "Camp, L. Jean"
+      affiliation: "University of North Carolina at Charlotte"
+app:
+  publicBaseUrl: ${APP_PUBLIC_BASE_URL:}
+  batch:
+    enabled: false

@@ -1,0 +1,73 @@
+
+https://github.com/apache/commons-lang
+https://github.com/expressjs/express
+https://github.com/pallets/flask
+https://github.com/spf13/cobra
+
+Flask
+
+GitHub Link: https://github.com/pallets/flask
+
+Express
+
+GitHub Link: https://github.com/expressjs/express
+
+Vue.js
+
+GitHub Link: https://github.com/vuejs/vue
+
+jQuery
+
+GitHub Link: https://github.com/jquery/jquery
+
+Lodash
+
+GitHub Link: https://github.com/lodash/lodash
+
+Django REST framework
+
+GitHub Link: https://github.com/encode/django-rest-framework
+
+React
+
+GitHub Link: https://github.com/facebook/react
+
+Python Requests
+
+GitHub Link: https://github.com/psf/requests
+
+Bootstrap
+
+GitHub Link: https://github.com/twbs/bootstrap
+
+Sass
+
+GitHub Link: https://github.com/sass/sass
+
+Hexo
+
+GitHub Link: https://github.com/hexojs/hexo
+
+TypeScript
+
+GitHub Link: https://github.com/Microsoft/TypeScript
+
+TinyMCE
+
+GitHub Link: https://github.com/tinymce/tinymce
+
+Node.js
+
+GitHub Link: https://github.com/nodejs/node
+
+Babel
+
+GitHub Link: https://github.com/babel/babel
+
+Hyperapp
+
+GitHub Link: https://github.com/jorgebucaran/hyperapp
+
+Socket.io
+
+GitHub Link: https://github.com/socketio/socket.io
