@@ -17,12 +17,14 @@ const sampleRepos = [
     "https://github.com/aws/aws-iot-device-sdk-embedded-C",
 ];
 
+const SHOW_SAMPLE_REPOS = false;
+
 const artifactDescriptions = {
     "Raw SPDX SBOM": "Machine-readable component inventory.",
     "SWID tag": "Software identity metadata for this repository/version.",
     "Combined SPDX+SWID": "Combined inventory and identity artifact.",
     "Publication manifest": "Record of what was generated and published.",
-    "Proof record": "Hash-based public proof without exposing the full SBOM.",
+    "Verifiable private record": "SHA-256 verification record without exposing the full SBOM.",
 };
 
 const howItWorksSteps = [
@@ -34,41 +36,41 @@ const howItWorksSteps = [
 ];
 
 const publicationModes = {
-    HASH_ONLY_PUBLIC: {
-        title: "Proof record only",
-        eyebrow: "Keep SBOM details private",
-        description:
-            "Publish a DOI-backed proof that this SBOM existed for this repository and commit. The full component list is not made public.",
-        publicSummary:
-            "Repository metadata, commit information, SBOM hash, provenance metadata, DOI, and publication manifest.",
-        previewTitle: "What will be public",
-        previewItems: [
-            "Repository metadata",
-            "Commit information",
-            "SBOM hash",
-            "Provenance metadata",
-            "DOI and publication manifest",
-        ],
-        previewNote:
-            "Full SPDX component inventory and combined SBOM artifacts stay out of the public record.",
-    },
     FULL_SBOM_PUBLIC: {
         title: "Full SBOM publication",
         eyebrow: "Publish full artifact set",
         description:
-            "Publish the full SPDX SBOM, SWID identity tag, combined artifact, manifest, and DOI-backed Zenodo record.",
+            "Publish the full SPDX SBOM, SWID identity tag, combined SPDX+SWID artifact, publication manifest, and Zenodo record with an assigned DOI.",
         publicSummary:
-            "Full component inventory, SWID metadata, combined SPDX+SWID artifact, publication manifest, DOI, and Zenodo record.",
+            "Full component inventory, SWID metadata, combined SPDX+SWID artifact, publication manifest, DOI, timestamp, and Zenodo record.",
         previewTitle: "What will be public",
         previewItems: [
-            "Full component inventory",
-            "SWID metadata",
+            "Full SPDX SBOM",
+            "SWID identity tag",
             "Combined SPDX+SWID artifact",
             "Publication manifest",
-            "DOI and Zenodo record",
+            "DOI, timestamp, and Zenodo record",
         ],
         previewNote:
             "Published artifact links are returned after a successful Zenodo publication run.",
+    },
+    HASH_ONLY_PUBLIC: {
+        title: "Verifiable private record",
+        eyebrow: "Keep SBOM details private",
+        description:
+            "Publish a DOI, timestamp, and SHA-256 verification hash without publishing the full SBOM component inventory.",
+        publicSummary:
+            "DOI, timestamp, SHA-256 verification hash, and publication manifest. The full component inventory is not public.",
+        previewTitle: "What will be public",
+        previewItems: [
+            "DOI",
+            "Timestamp",
+            "SHA-256 verification hash",
+            "Publication manifest",
+            "One-time private SBOM download available for 15 minutes",
+        ],
+        previewNote:
+            "The full component inventory is generated but not published.",
     },
 };
 
@@ -77,11 +79,11 @@ const workflowSteps = [
     "Cloning repository",
     "Generating SBOM",
     "Validating SPDX",
-    "Computing hash and metadata",
+    "Computing SHA-256 hash and metadata",
     "Preparing publication record",
     "Publishing selected public artifacts",
     "Verifying DOI",
-    "Cleaning local workspace",
+    "Removing local workspace",
 ];
 
 const statusCopy = {
@@ -148,7 +150,7 @@ function friendlyErrorMessage(message) {
     ) {
         return "This must be a public HTTPS Git repository URL, for example https://github.com/org/repo.";
     }
-    return "v-ops could not complete the publication workflow. Check the repository URL and try again.";
+    return "VOPS could not complete the publication workflow. Check the repository URL and try again.";
 }
 
 function App() {
@@ -167,7 +169,7 @@ function App() {
         status === "running"
             ? "Processing..."
             : publicationMode === "HASH_ONLY_PUBLIC"
-                ? "Generate Private Proof Record"
+                ? "Generate Verifiable Private Record"
                 : "Generate and Publish SBOM";
     const statusClass =
         status === "running"
@@ -241,7 +243,7 @@ function App() {
     const progressMessage = (() => {
         if (status === "running") {
             return effectiveMode === "HASH_ONLY_PUBLIC"
-                ? "Preparing a confidentiality-preserving proof publication."
+                ? "Preparing a verifiable private record."
                 : "Preparing a full public SBOM publication.";
         }
         if (result?.publicationStage === "DOI_VERIFIED") {
@@ -294,7 +296,7 @@ function App() {
 
     const publishedArtifactLinks = effectiveMode === "HASH_ONLY_PUBLIC"
         ? [
-            { label: "Proof record", url: result?.proofRecordUrl },
+            { label: "Verifiable private record", url: result?.proofRecordUrl },
             { label: "Publication manifest", url: manifestUrl },
         ].filter((item) => item.url && item.url.trim().length > 0)
         : [
@@ -309,21 +311,22 @@ function App() {
             <div className="shell">
                 <div className="top">
                     <header className="hero">
-                        <span className="brand-mark">v-ops</span>
+                        <span className="brand-mark">VOPS</span>
                         <div>
                             <p className="tagline">Verifiable (optionally private) SBOMs</p>
                             <h1>SBOM publication records for IoT and edge software studies.</h1>
                         </div>
                         <p>
-                            v-ops generates verifiable SBOM publication records for public Git repositories.
-                            It supports both full public SBOM publication and privacy-preserving proof records,
-                            making it useful for IoT, edge, and connected-device software studies.
+                            VOPS supports the generation of compliant, auditable, dated SBOMs that are easy to locate,
+                            cite, and associate with a specific commit of free and open source software. VOPS is designed
+                            for users of OSS, particularly IoT, edge, and connected-device software, where an SBOM is
+                            needed without increasing the burden on maintainers.
                         </p>
                         <div className="what-panel">
                             <div className="info-label">What this tool does</div>
                             <p>
-                                v-ops clones a public repository, generates an SPDX SBOM, creates SWID identity
-                                metadata, and publishes either a DOI-backed proof record or the full SBOM artifact set.
+                                VOPS clones a public repository, generates an SPDX SBOM, creates SWID identity metadata,
+                                and publishes either the full SBOM artifact set or a publicly verifiable private record.
                             </p>
                         </div>
                     </header>
@@ -347,23 +350,25 @@ function App() {
                                         SSH URLs, private repositories, or ordinary web pages.
                                     </p>
 
-                                    <div className="sample-row">
-                                        <label className="sample-label" htmlFor="sampleRepo">Try an IoT sample repository</label>
-                                        <div className="sample-controls">
-                                            <select
-                                                id="sampleRepo"
-                                                value=${selectedSample}
-                                                onChange=${(event) => setSelectedSample(event.target.value)}
-                                            >
-                                                ${sampleRepos.map((repo) => html`
-                                                    <option value=${repo}>${repo}</option>
-                                                `)}
-                                            </select>
-                                            <button className="secondary" type="button" onClick=${handleSample}>
-                                                Use selected sample
-                                            </button>
+                                    ${SHOW_SAMPLE_REPOS ? html`
+                                        <div className="sample-row">
+                                            <label className="sample-label" htmlFor="sampleRepo">Sample repository</label>
+                                            <div className="sample-controls">
+                                                <select
+                                                    id="sampleRepo"
+                                                    value=${selectedSample}
+                                                    onChange=${(event) => setSelectedSample(event.target.value)}
+                                                >
+                                                    ${sampleRepos.map((repo) => html`
+                                                        <option value=${repo}>${repo}</option>
+                                                    `)}
+                                                </select>
+                                                <button className="secondary" type="button" onClick=${handleSample}>
+                                                    Use selected sample
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ` : null}
                                 </div>
 
                                 <div className="field-group">
@@ -517,8 +522,8 @@ function App() {
 
                     ${result
         ? html`
-                            <div className="publication-panel">
-                                <div className="info-label">Results display</div>
+                            <div className="publication-panel detailed-results-panel">
+                                <div className="info-label">Detailed results</div>
                                 <div className="details">
                                     <div><strong>Publication mode:</strong> ${result.publicationMode || publicationMode}</div>
                                     ${reservedDoi ? html`<div><strong>Reserved DOI:</strong> ${reservedDoi}</div>` : null}
@@ -539,44 +544,37 @@ function App() {
                                             </div>
                                         `
             : null}
+                                    ${result.generatedAt ? html`<div><strong>Generated:</strong> ${formatTimestamp(result.generatedAt)}</div>` : null}
+                                    ${result.commitSha ? html`<div><strong>Commit SHA:</strong> ${result.commitSha}</div>` : null}
+                                    ${result.resolvedVersion ? html`<div><strong>Version:</strong> ${result.resolvedVersion}</div>` : null}
+                                    ${result.sbomSha256 ? html`<div><strong>SBOM SHA-256:</strong> ${result.sbomSha256}</div>` : null}
+                                    ${effectiveMode === "HASH_ONLY_PUBLIC" && result.proofRecordFileName
+            ? html`<div><strong>Verifiable private record file:</strong> ${result.proofRecordFileName}</div>`
+            : null}
+                                    ${effectiveMode === "FULL_SBOM_PUBLIC" && result.fileName
+            ? html`<div><strong>SBOM file:</strong> ${result.fileName}</div>`
+            : null}
+                                    ${effectiveMode === "FULL_SBOM_PUBLIC" && result.swidFileName
+            ? html`<div><strong>SWID file:</strong> ${result.swidFileName}</div>`
+            : null}
+                                    ${effectiveMode === "FULL_SBOM_PUBLIC" && result.combinedSbomFileName
+            ? html`<div><strong>Combined file:</strong> ${result.combinedSbomFileName}</div>`
+            : null}
+                                    ${result.publicationManifestFileName
+            ? html`<div><strong>Publication manifest:</strong> ${result.publicationManifestFileName}</div>`
+            : null}
+                                    ${effectiveMode === "HASH_ONLY_PUBLIC"
+            ? html`<div><strong>Public disclosure:</strong> Full SBOM was generated and hashed but not publicly posted.</div>`
+            : null}
                                 </div>
                             </div>
                         `
         : html`
                             <div className="publication-panel">
-                                <div className="info-label">Results display</div>
+                                <div className="info-label">Detailed results</div>
                                 <div className="details">Run the workflow to populate DOI, publication, and artifact details.</div>
                             </div>
                         `}
-
-                    ${result
-        ? html`
-                            <div className="result-meta">
-                                ${result.generatedAt ? html`<div><strong>Generated:</strong> ${formatTimestamp(result.generatedAt)}</div>` : null}
-                                ${result.commitSha ? html`<div><strong>Commit SHA:</strong> ${result.commitSha}</div>` : null}
-                                ${result.resolvedVersion ? html`<div><strong>Version:</strong> ${result.resolvedVersion}</div>` : null}
-                                ${result.sbomSha256 ? html`<div><strong>SBOM SHA-256:</strong> ${result.sbomSha256}</div>` : null}
-                                ${effectiveMode === "HASH_ONLY_PUBLIC" && result.proofRecordFileName
-            ? html`<div><strong>Proof file:</strong> ${result.proofRecordFileName}</div>`
-            : null}
-                                ${effectiveMode === "FULL_SBOM_PUBLIC" && result.fileName
-            ? html`<div><strong>SBOM file:</strong> ${result.fileName}</div>`
-            : null}
-                                ${effectiveMode === "FULL_SBOM_PUBLIC" && result.swidFileName
-            ? html`<div><strong>SWID file:</strong> ${result.swidFileName}</div>`
-            : null}
-                                ${effectiveMode === "FULL_SBOM_PUBLIC" && result.combinedSbomFileName
-            ? html`<div><strong>Combined file:</strong> ${result.combinedSbomFileName}</div>`
-            : null}
-                                ${result.publicationManifestFileName
-            ? html`<div><strong>Publication manifest:</strong> ${result.publicationManifestFileName}</div>`
-            : null}
-                                ${effectiveMode === "HASH_ONLY_PUBLIC"
-            ? html`<div><strong>Public disclosure:</strong> Full SBOM intentionally not publicly posted.</div>`
-            : null}
-                            </div>
-                        `
-        : null}
 
                     ${publishedArtifactLinks.length > 0
         ? html`
@@ -600,19 +598,19 @@ function App() {
                                 <div className="info-label">Private SBOM download</div>
                                 <div className="private-download-copy">
                                     <p>
-                                        The full SBOM was generated and hashed, but it was not published. Only the proof
-                                        record and publication manifest are public.
-                                    </p>
-                                    <p>
-                                        You can download the private SBOM once for your own records. The link expires
-                                        shortly and is deleted after use.
+                                        The full SBOM was generated and hashed, but it was not published. It will only
+                                        be stored on our system for 15 minutes. You may download the SBOM once for your
+                                        own records. After 15 minutes, the SBOM itself will no longer be provided; only
+                                        the verifying SHA-256 hash and associated DOI will remain. Please download the
+                                        SBOM and make a record of the associated DOI.
                                     </p>
                                 </div>
+                                <div className="private-expiry-urgent">This link expires in 15 minutes.</div>
                                 ${privateDownloadExpiresAt
-            ? html`<div className="private-expiry"><strong>Expires:</strong> ${privateDownloadExpiresAt}</div>`
+            ? html`<div className="private-expiry"><strong>Exact expiry:</strong> ${privateDownloadExpiresAt}</div>`
             : null}
                                 ${result.privateSbomDownloadMessage
-            ? html`<div className="private-download-message">${result.privateSbomDownloadMessage}</div>`
+            ? html`<div className="private-download-message">The private SBOM is removed after use or expiration.</div>`
             : null}
                                 <div className="private-download-actions">
                                     <button

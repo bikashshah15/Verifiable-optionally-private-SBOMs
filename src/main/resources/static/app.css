@@ -535,22 +535,6 @@ button:disabled {
     color: var(--accent-strong);
 }
 
-.result-meta {
-    display: grid;
-    gap: 7px;
-    padding: 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: #fbfcfe;
-    color: var(--muted);
-    font-size: 0.96rem;
-    overflow-wrap: anywhere;
-}
-
-.result-meta strong {
-    color: var(--ink);
-}
-
 .publication-panel {
     display: grid;
     gap: 10px;
@@ -558,6 +542,14 @@ button:disabled {
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.9);
+}
+
+.detailed-results-panel {
+    background: #fbfcfe;
+}
+
+.detailed-results-panel .details strong {
+    color: var(--ink);
 }
 
 .workflow-panel summary {
@@ -667,6 +659,15 @@ button:disabled {
     font-size: 0.94rem;
 }
 
+.private-expiry-urgent {
+    width: fit-content;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    background: #fff0dc;
+    color: #8f470d;
+    font-weight: 800;
+}
+
 .private-download-actions {
     display: flex;
     justify-content: flex-start;
@@ -674,13 +675,13 @@ button:disabled {
 
 .private-download-button {
     min-height: 46px;
-    background: #b35c13;
+    background: var(--success);
     color: #ffffff;
-    box-shadow: 0 10px 20px rgba(179, 92, 19, 0.18);
+    box-shadow: 0 10px 20px rgba(8, 127, 91, 0.2);
 }
 
 .private-download-button:hover:not(:disabled) {
-    background: #8f470d;
+    background: #06684a;
 }
 
 .hint,
