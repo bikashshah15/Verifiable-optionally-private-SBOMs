@@ -1,0 +1,66 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "vops-updated",
+      "image": "383418747870.dkr.ecr.us-east-1.amazonaws.com/vops-updated-service:8df0343",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SERVER_PORT",
+          "value": "8080"
+        },
+        {
+          "name": "APP_BATCH_ENABLED",
+          "value": "false"
+        },
+        {
+          "name": "SPRING_APPLICATION_JSON",
+          "value": "{\"zenodo\": {\"autoPublish\": true}}"
+        },
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "ZENODO_ACCESS_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:383418747870:secret:vops/prod/zenodo/access-token-pJA1q9"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/vops-updated-service",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "vops-updated-task",
+  "executionRoleArn": "arn:aws:iam::383418747870:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "placementConstraints": [],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048"
+}
