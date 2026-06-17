@@ -4,11 +4,17 @@ Verifiable (optionally private) SBOMs
 
 ## Short Overview
 
-v-ops generates verifiable, optionally private SBOM publication records for public source code repositories.
+ VOPS generates verifiable, optionally private SBOM publication records for public source code repositories.  The goal is to support users of FOSS in the creation of verifiable, identifiable version-specific SBOMs without requiring any action by maintainers.
 
-The application accepts a public HTTPS Git repository URL, clones the repository, generates an SPDX JSON SBOM, validates basic SPDX structure, creates a deterministic SWID XML tag, and prepares publication artifacts. Depending on the selected publication mode, it can publish a full DOI-backed SBOM artifact set to Zenodo or publish only a hash-based proof record that shows an SBOM existed for a specific repository and commit.
+The application accepts a public HTTPS Git repository URL, clones the repository, generates an SPDX JSON SBOM, validates basic SPDX structure, creates a  SWID XML tag, obtains a data DoI, and prepares publication artifacts. Depending on the selected publication mode, it can publish a full DOI-backed SBOM artifact set to Zenodo or publish only a proof record that shows an SBOM existed for a specific repository and commit.
 
-SBOM publication records matter because they make software supply chain evidence easier to cite, verify, and compare. A DOI-backed record gives a stable publication target. The SBOM hash, commit SHA, SWID tag, proof record, and publication manifest provide provenance and integrity signals. The hash-only workflow supports public verification without exposing the full component list.
+Verifiable, dated, public SBOMs provide evidence that is easy to locate, cite, and compare. A DOI provides a stable resource identifier. The SBOM hash, SWID tag, and publication manifest provide provenance and integrity. V-OPS provides users of free and open source software (FOSS) a method for auditable compliance without adding to the burden of maintainers. FOSS users can create VOPS records and integrate the identifiers easily into their documentation.
+
+VOPS provides an optiion for private SBOMs. A private SBOM in VOPS consists of the hash of the identifiers, timestamp, and SBOM. With a private VOPS the full record is provided once, at generation, and only to the requestor.
+
+H(DoI, SWID, timestamp, SBOM)
+
+ The hash is published as the record. The listing of dependencies nor the name of the repository itself is not. VOPS provides commerical users of FOSS with a provable, auditable but not public record of their software components.
 
 The application is intended for public source repositories only. Inputs must be HTTPS Git repository URLs such as `https://github.com/org/repo`. Private repositories, SSH URLs, ZIP files, and arbitrary webpages are not valid inputs.
 
