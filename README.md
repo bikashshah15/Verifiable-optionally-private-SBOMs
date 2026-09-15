@@ -1,4 +1,4 @@
-# v-ops
+# VOPS
 
 Verifiable (optionally private) SBOMs
 
